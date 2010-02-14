@@ -1,70 +1,95 @@
-class WrappedSet
-  def initialize(method, selector, parent, browser)
-    @method, @selector, @parent, @browser = method, selector, parent, browser
-  end
-  
+module WrappedSetMethods
   def length
-    @browser.eval_js "#{self.to_jquery}.length"
+    eval_jquery ".length"
   end
   
   def val(value=nil)
-    args = value.nil? ? "" : %|"#{value}"|
-    @browser.eval_js "#{self.to_jquery}.val(#{args})"
-  end
-  
-  def text()
-    @browser.eval_js %|#{self.to_jquery}.text()|
-  end
-  
-  def html
-    @browser.eval_js %|#{self.to_jquery}.html()|
-  end
-  
-  def attr(key)
-    @browser.eval_js %|#{self.to_jquery}.attr("#{key}")|
-  end
-  
-  def click
-    js_click = %{
-      (function() {
-        var $el = #{self.to_jquery};
-        var onClick = $el.attr('onclick');
-        var ev_reference;
-        var ev_capture = function(ev) { ev_reference = ev; };
-        $el.bind('click', ev_capture);
-        if (typeof onClick == 'function') { $el.bind('click', onClick); };
-        $el.trigger('click');
-        $el.unbind('click', ev_capture);
-        if (typeof onClick == 'function') { $el.unbind('click', onClick); };
-        if (ev_reference && !ev_reference.isDefaultPrevented()) {
-          if ($el.is('a')) {
-            window.location = $el.attr('href');
-          }
-          else if ($el.is('input') && $el.attr('type') == 'submit') {
-            $($el).parents('form').submit();
-          }
-        };
-        return true;
-      })()
-    }.gsub(/[\r\n]/, '')
-    @browser.waiting_for_page_load do
-      @browser.eval_js js_click
+    if value.nil?
+      eval_jquery ".val()"
+    else
+      exec_jquery %|.val("#{value}")|
     end
   end
   
-  def to_jquery
-    %{#{@parent.nil? ? 'jQuery' : @parent.to_jquery + '.' + @method}("#{@selector}")}
+  def text
+    assert_exists
+    eval_jquery ".text()"
+  end
+  
+  def html
+    eval_jquery ".html()"
+  end
+  
+  def attr(key)
+    eval_jquery ".attr(\"#{key}\")"
+  end
+  
+  def click
+    assert_exists
+    eval_jquery("[0]").click
   end
   
   def find(selector)
-    WrappedSet.new('find', selector, self, @browser)
+    child_set(:find, selector)
   end
   
   def next(selector)
-    WrappedSet.new('next', selector, self, @browser)
+    child_set(:next, selector)
   end
   
   def eq(index)
-    WrappedSet.new('eq', index, self, @browser)
+    child_set(:eq, index)
   end
+  
+  def exist?
+    self.length > 0
+  end
+  
+  private
+
+  def exec_jquery(member_expression)
+    @browser.eval_js %|#{jquery_chain}#{member_expression}; return true;|
+  end
+  
+  def eval_jquery(member_expression)
+    @browser.eval_js %|return #{jquery_chain}#{member_expression};|
+  end
+  
+  def child_set(name, *args)
+    WrappedSet.new(@browser, self, name, *args)
+  end
+  
+  def assert_exists
+    # shouldn't have to do this
+    tries = 0
+    until exist? or tries == 10
+      sleep 0.2
+      tries += 1
+    end
+    raise "#{jquery_chain} contains no elements" if tries == 10
+  end
+end
+
+class RootWrappedSet
+  include WrappedSetMethods
+  
+  def initialize(browser, selector)
+    @browser, @selector = browser, selector
+  end
+  
+  def jquery_chain
+    %{jQuery("#{@selector}")}
+  end
+end
+
+class WrappedSet
+  include WrappedSetMethods
+  
+  def initialize(browser, parent, method, selector)
+    @browser, @parent, @method, @selector = browser, parent, method, selector
+  end
+  
+  def jquery_chain
+    %{#{@parent.jquery_chain}.#{@method.to_s}("#{@selector}")}
+  end 
 end

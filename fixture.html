@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <script type="text/javascript" src="jquery.js"></script>
+    <title>Fixture</title>
+  </head>
+  <body>
+    <h1>Fixture</h1>
+    <form id="form" action="fixture.html?something">
+      <input id="button" type="button" value="button" />
+      <input id="submit" type="submit" value="submit" />
+    </form>
+    <ul id="log"></ul>
+    
+    <script type="text/javascript">
+      function log(what) {
+        $("#log").append('<li>' + what + '</li>');
+        return false;
+      }
+      function bindToLog(what) { return function() { return log(what); } }
+      $("input[type='button']").click(bindToLog("button clicked"));
+      
+    </script>
+  </body>
+</html>

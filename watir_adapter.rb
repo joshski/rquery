@@ -1,6 +1,12 @@
+require 'watir-webdriver'
+
 class WatirAdapter
-  def initialize()
-    @watir_browser = WatirBrowser.new
+  def initialize
+    @watir_browser = Watir::Browser.new(watir_driver)
+  end
+  
+  def watir_driver
+    (ENV['watir_driver'] || :firefox).to_sym
   end
   
   def visit(url)
@@ -8,16 +14,22 @@ class WatirAdapter
   end
   
   def eval_js(js)
-    @watir_browser.eval_js(js)
+    @watir_browser.execute_script(js)
   end
   
   def title
     @watir_browser.title
   end
   
-  def waiting_for_page_load
-    @watir_browser.waiting_for_page_load do
-      yield
-    end
+  def html
+    @watir_browser.html
+  end
+  
+  def close
+    @watir_browser.close
+  end
+  
+  def url
+    @watir_browser.url
   end
 end

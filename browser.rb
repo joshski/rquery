@@ -1,3 +1,5 @@
+require 'wrapped_set'
+
 class Browser
   def initialize(adapter)
     @adapter = adapter
@@ -5,7 +7,7 @@ class Browser
   
   def jquery(selector)
     inject_jquery_if_necessary
-    WrappedSet.new('find', selector, nil, self)
+    RootWrappedSet.new(self, selector)
   end
   
   def visit(url)
@@ -17,25 +19,41 @@ class Browser
   end 
   
   def eval_js(js)
-    puts js
+    inject_jquery_if_necessary
     @adapter.eval_js(js)
   end
   
-  def waiting_for_page_load
-    @adapter.waiting_for_page_load do
-      yield
-    end
+  def close
+    @adapter.close
+  end
+  
+  def html
+    @adapter.html
+  end
+  
+  def url
+    @adapter.url
   end
   
   private
   
   def inject_jquery_if_necessary
-    if @adapter.eval_js("typeof(jQuery) == 'undefined'").to_s == "true"
-      File.open(File.expand_path(File.join(File.dirname(__FILE__), "jquery.js")), "r") do |file|
-        @adapter.eval_js file.readlines.join('')
-        @adapter.eval_js "window.jquery=function() {return jQuery.apply(this, arguments);}"
-      end
+    unless jquery_defined?
+      @adapter.eval_js jquery_src
+      @adapter.eval_js define_lower_case_jquery
     end
-    raise "failed to inject jquery " if @adapter.eval_js("typeof(jQuery) == 'undefined'").to_s == "true"
+    raise "failed to inject jquery " unless jquery_defined?
+  end
+  
+  def jquery_defined?
+    @adapter.eval_js("return typeof jQuery;") != "undefined"
+  end
+  
+  def jquery_src
+    @@jquery_src ||= File.read(File.join(File.dirname(__FILE__), "jquery.js"))
+  end
+  
+  def define_lower_case_jquery
+    "window.jquery=function() {return jQuery.apply(this, arguments);}"
   end
 end
