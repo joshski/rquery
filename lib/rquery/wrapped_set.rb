@@ -1,5 +1,7 @@
 module RQuery
   module WrappedSetMethods
+    include Enumerable
+    
     def length
       eval_jquery ".length"
     end
@@ -44,6 +46,21 @@ module RQuery
   
     def exist?
       self.length > 0
+    end
+    
+    def filter(selector=nil, &block)
+      if (block_given?)
+        select(&block)
+      else
+        child_set(:filter, selector)
+      end
+    end
+    
+    def each
+      len = length
+      (0..len).each do |i|
+        yield(eq(i))
+      end
     end
   
     private

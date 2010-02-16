@@ -1,43 +1,50 @@
-require 'rubygems'
-require 'spec'
-
-$:.unshift(File.dirname(__FILE__) + '/../lib')
-require 'rquery'
+require File.join(File.dirname(__FILE__), "spec_helper")
 
 module RQuery
-  describe "a spec with browser dsl" do
+  describe Browser do
     include BrowserDsl
+
+    before(:each) do
+      visit "file://" + File.join(File.dirname(__FILE__), "fixture.html").gsub("\\", "/")
+    end
 
     after(:all) do
       close
     end
-  
-    it "clicks" do
-      visit "file://" + File.join(File.dirname(__FILE__), "fixture.html").gsub("\\", "/")
+    
+    it "has a title" do
       title.should include("Fixture")
+    end
+    
+    it "has html" do
+      html.should include("<html")
+    end
+  
+    it "finds element text" do
       jquery("h1").text.should include("Fixture")
+    end
+    
+    it "clicks buttons" do
       jquery("#button").click
       jquery("#log").text.should == "button clicked"
     end
-
-    it "finds jquery documentation" do
-      visit "http://www.google.com"
-      title.should include("Google")
-      html.should include("Google")
-      jquery("input[name='q']").val("jquery")
-      jquery("input[name='q']").val.should == "jquery"
-      jquery("input[value='Google Search']").click
-      first_result = jquery("a:contains('jQuery'):first")
-      first_result.text.should include("Write Less, Do More")
-      first_result.click
-      title.should include("Write Less, Do More")
-      jquery("a:contains('Documentation')").click
-      jquery("h1.firstHeading").text.should == "Main Page"
-      jquery("img:first").attr("src").should =~ /jquery/
-      jquery("img").eq(0).attr("src").should =~ /jquery/
-      jquery("#jq-primarySearch").val("selectors")
-      jquery("#jq-searchGoButton").click
-      jquery("a:contains('Attribute Ends With')").length.should == 1
+    
+    it "finds set length" do
+      jquery("input").length.should > 1
+    end
+    
+    it "finds sets of elements" do
+      jquery("input").length.should > 1
+    end
+    
+    it "filters by block" do
+      submits = jquery("input").filter { |input| input.attr('type') == "submit" }
+      submits.length.should == 1
+    end
+    
+    it "filters by selector" do
+      submits = jquery("input").filter("[type='submit']")
+      submits.length.should == 1
     end
   end
 end
