@@ -5,7 +5,13 @@
   </head>
   <body>
     <h1>Fixture</h1>
+    
+    <a id="link1" href="http://link1/" class="link link1">link 1</a>
+    <a id="link2" href="http://link2/" class="link link2">link 2</a>
+    <a id="link3" href="http://link3/">link 3</a>
+    
     <form id="form" action="fixture.html?something">
+      <input id="text" type="text" value="text" />
       <input id="button" type="button" value="button" />
       <input id="submit" type="submit" value="submit" />
     </form>
@@ -18,7 +24,7 @@
       }
       function bindToLog(what) { return function() { return log(what); } }
       $("input[type='button']").click(bindToLog("button clicked"));
-      
+      $("input[type='text']").change(bindToLog("text changed"));
     </script>
   </body>
 </html>

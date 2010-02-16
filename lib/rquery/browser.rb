@@ -19,7 +19,13 @@ module RQuery
   
     def eval_js(js)
       inject_jquery_if_necessary
-      @adapter.eval_js(js)
+      begin
+        result = @adapter.eval_js(js)
+      rescue => e
+        raise "eval_js raised:#{js}\n#{e.message}"
+      end
+      raise "eval_js returned nil:#{js}" if result.nil?
+      result
     end
   
     def close

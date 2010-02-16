@@ -43,6 +43,22 @@ module RQuery
     def eq(index)
       child_set(:eq, index)
     end
+    
+    def is(selector)
+      eval_jquery %|.is("#{selector}")|
+    end
+    
+    def not(selector)
+      child_set(:not, selector)
+    end
+    
+    def slice(from, to=nil)
+      child_set(:slice, *[from, to].compact)
+    end
+    
+    def has_class(names)
+      eval_jquery %|.hasClass("#{names}")|
+    end
   
     def exist?
       self.length > 0
@@ -58,7 +74,7 @@ module RQuery
     
     def each
       len = length
-      (0..len).each do |i|
+      (0..len-1).each do |i|
         yield(eq(i))
       end
     end
@@ -103,12 +119,18 @@ module RQuery
   class WrappedSet
     include WrappedSetMethods
   
-    def initialize(browser, parent, method, selector)
-      @browser, @parent, @method, @selector = browser, parent, method, selector
+    def initialize(browser, parent, method, *args)
+      @browser, @parent, @method, @args = browser, parent, method, args
     end
   
     def jquery_chain
-      %{#{@parent.jquery_chain}.#{@method.to_s}("#{@selector}")}
-    end 
+      %{#{@parent.jquery_chain}.#{@method.to_s}(#{format_args})}
+    end
+    
+    private
+    
+    def format_args
+      @args.map { |arg| arg.inspect }.join(", ")
+    end
   end
 end
