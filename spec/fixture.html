@@ -12,7 +12,8 @@
     
     <form id="form" action="fixture.html?something">
       <input id="text" type="text" value="text" />
-      <input id="button" type="button" value="button" />
+      <input id="button1" type="button" value="button 1" />
+      <input id="button2" type="button" value="button 2" />
       <input id="submit" type="submit" value="submit" />
     </form>
     <ul id="log"></ul>
@@ -23,8 +24,9 @@
         return false;
       }
       function bindToLog(what) { return function() { return log(what); } }
-      $("input[type='button']").click(bindToLog("button clicked"));
-      $("input[type='text']").change(bindToLog("text changed"));
+      $("#button1").click(bindToLog("button 1 clicked"));
+      $("#button2").click(bindToLog("button 2 clicked"));
+      $("#text").change(bindToLog("text changed"));
     </script>
   </body>
 </html>

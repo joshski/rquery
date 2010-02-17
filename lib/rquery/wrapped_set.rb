@@ -29,7 +29,13 @@ module RQuery
   
     def click
       assert_exists
-      eval_jquery("[0]").click
+      each_index do |i|
+        eval_jquery("[#{i}]").click
+      end
+    end
+    
+    def [](index)
+      eval_jquery("[#{index}]")
     end
   
     def find(selector)
@@ -38,6 +44,22 @@ module RQuery
   
     def next(selector)
       child_set(:next, selector)
+    end
+    
+    def next_all(selector)
+      child_set(:nextAll, selector)
+    end
+    
+    def prev(selector)
+      child_set(:prev, selector)
+    end
+    
+    def prev_all(selector)
+      child_set(:prevAll, selector)
+    end
+    
+    def siblings(selector=nil)
+      child_set(:siblings, selector)
     end
   
     def eq(index)
@@ -52,8 +74,24 @@ module RQuery
       child_set(:not, selector)
     end
     
+    def add(selector)
+      child_set(:add, selector)
+    end
+    
     def slice(from, to=nil)
       child_set(:slice, *[from, to].compact)
+    end
+    
+    def children(selector=nil)
+      child_set(:children, *(selector.nil? ? [] : [selector]))
+    end
+    
+    def parent(selector=nil)
+      child_set(:parent, *(selector.nil? ? [] : [selector]))
+    end
+    
+    def parents(selector=nil)
+      child_set(:parents, *(selector.nil? ? [] : [selector]))
     end
     
     def has_class(names)
@@ -62,6 +100,14 @@ module RQuery
   
     def exist?
       self.length > 0
+    end
+    
+    def empty?
+      self.length == 0
+    end
+    
+    def map_text
+      map { |element| element.text }
     end
     
     def filter(selector=nil, &block)
@@ -73,9 +119,14 @@ module RQuery
     end
     
     def each
-      len = length
-      (0..len-1).each do |i|
+      each_index do |i|
         yield(eq(i))
+      end
+    end
+    
+    def each_index
+      (0..length-1).each do |i|
+        yield(i)
       end
     end
   
@@ -90,7 +141,7 @@ module RQuery
     end
   
     def child_set(name, *args)
-      WrappedSet.new(@browser, self, name, *args)
+      WrappedSet.new(@browser, self, name, *args.compact)
     end
   
     def assert_exists

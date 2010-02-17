@@ -4,7 +4,7 @@ module RQuery
   describe Browser do
     include BrowserDsl
 
-    before(:each) do
+    before(:all) do
       visit "file://" + File.join(File.dirname(__FILE__), "fixture.html").gsub("\\", "/")
     end
 
@@ -21,7 +21,9 @@ module RQuery
     end
   
     it "finds element text" do
-      jquery("h1").text.should include("Fixture")
+      jquery("a").text.should include("link 1")
+      jquery("a").text.should include("link 2")
+      jquery("a#link1").text.should include("link 1")
     end
   
     it "reads element attribute values" do
@@ -34,8 +36,13 @@ module RQuery
     end
   
     it "clicks buttons" do
-      jquery("#button").click
-      jquery("#log").text.should == "button clicked"
+      jquery("#button1").click
+      jquery("#button1, #button2").click
+      jquery("#button2").click
+      jquery("#log li").map_text.should == ["button 1 clicked",
+                                            "button 1 clicked",
+                                            "button 2 clicked",
+                                            "button 2 clicked"] 
     end
   
     it "finds set length" do
@@ -82,8 +89,48 @@ module RQuery
   
     it "selects a subset of the matched elements" do
       three_links = jquery("#link1, #link2, #link3")
-      three_links.slice(0, 2).map { |a| a.text }.should == ["link 1", "link 2"]
-      three_links.slice(1).map { |a| a.text }.should == ["link 2", "link 3"]
+      three_links.slice(0, 2).map_text.should == ["link 1", "link 2"]
+      three_links.slice(1).map_text.should == ["link 2", "link 3"]
+    end
+    
+    it "adds selectors to the set of matched elements" do
+      jquery("#link1, #link2, #link3").add("#text, #button1").length.should == 5
+    end
+    
+    it "finds child elements" do
+      jquery("form").children.length.should == jquery("form > *").length
+      jquery("form").children("input").length.should == jquery("form > input").length
+    end
+    
+    it "finds parent elements" do
+      jquery("#link1").parent.is("body").should be_true
+      jquery("#link1").parent("body").is("body").should be_true
+    end
+    
+    it "finds ancestor elements" do
+      jquery("#link1").parents.length.should == 2
+      jquery("#link1").parents("body").length.should == 1
+    end
+    
+    it "finds next sibling element matching selector" do
+      jquery("#link1").next("a").text.should == "link 2"
+    end
+    
+    it "finds previous sibling element matching selector" do
+      jquery("#link2").prev("a").text.should == "link 1"
+    end
+    
+    it "finds all next sibling elements matching selector" do
+      jquery("#link1").next_all("#link2, #link3").map_text.should == ["link 2", "link 3"]
+    end
+    
+    it "finds all previous sibling elements matching selector" do
+      jquery("#link3").prev_all("#link2, #link1").map_text.should == ["link 2", "link 1"]
+    end
+    
+    it "finds siblings" do
+      jquery("#link2").siblings("#link1, #link3").map_text.should == ["link 1", "link 3"]
+      jquery("#link2").siblings.filter("#link1, #link3").map_text.should == ["link 1", "link 3"]
     end
   
   end
