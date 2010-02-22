@@ -44,13 +44,29 @@ module IRB
    end
 end
 
+module Help
+  def cheat
+    puts ""
+    puts %| RQUERY DSL EXAMPLES                                                              |
+    puts %| -------------------------------------------------------------------------------- |
+    puts %{ visit "<url>"                    : navigate the browser to <url>                 }
+    puts %{ jquery("a").length               : count the links                               }
+    puts %{ jquery("input[type='radio']")    : all radio buttons                             }
+    puts %{ jquery("#search_button").click   : click the element with id 'search_button'     } 
+    puts %{ jquery("body a").first.text      : the text of the first anchor in the body      }
+    puts %{ jquery("table.red td").each      : each cell in the table with class 'red'       }
+    puts %{ jquery("a:first").next("p")      : the paragaph after the first link             }
+    puts %{ close                            : close the browser                             }
+    puts ""
+  end
+end
+
 class Object
   include IRB::ExtendCommandBundle # so that Marshal.dump works
 end
 
-if __FILE__ == $0
-   x = Object.new
-   x.extend RQuery::BrowserDsl
-   puts "\nRQuery IRB"
-   IRB.start_session(x)
-end
+context = Object.new
+context.extend RQuery::BrowserDsl
+context.extend Help
+puts "-- RQuery IRB session (type 'cheat' for examples)"
+IRB.start_session(context)
