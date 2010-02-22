@@ -129,6 +129,10 @@ module RQuery
         yield(i)
       end
     end
+    
+    def inspect
+      "#<WrappedSet #{jquery_chain} length=#{length}>"
+    end
   
     private
 
