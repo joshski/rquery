@@ -65,8 +65,14 @@ class Object
   include IRB::ExtendCommandBundle # so that Marshal.dump works
 end
 
-context = Object.new
-context.extend RQuery::BrowserDsl
-context.extend Help
+class RQuerySession
+  include RQuery::BrowserDsl
+  include Help
+  
+  def to_s
+    "rquery"
+  end
+end
+
 puts "-- RQuery IRB session (type 'cheat' for examples)"
-IRB.start_session(context)
+IRB.start_session(RQuerySession.new)
