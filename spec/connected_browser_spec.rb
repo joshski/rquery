@@ -19,7 +19,7 @@ module RQuery
       first_result.text.should include("Write Less, Do More")
       first_result.click
       title.should include("Write Less, Do More")
-      jquery("a:contains('Documentation')").click
+      jquery("a:contains('Documentation')").first.click
       jquery("h1.firstHeading").text.should == "Main Page"
       jquery("img:first").attr("src").should =~ /jquery/
       jquery("img").eq(0).attr("src").should =~ /jquery/

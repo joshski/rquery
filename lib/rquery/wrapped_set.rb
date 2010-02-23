@@ -157,6 +157,16 @@ module RQuery
     def inspect
       "#<WrappedSet #{jquery_chain} length=#{length}>"
     end
+    
+    def assert_exists
+      # shouldn't have to do this
+      tries = 0
+      until exist? or tries == 10
+        sleep 0.2
+        tries += 1
+      end
+      raise "#{jquery_chain} contains no elements" if tries == 10
+    end
   
     private
 
@@ -178,16 +188,6 @@ module RQuery
     
     def child_set(name, *args)
       WrappedSet.new(@browser, self, name, *args.compact)
-    end
-  
-    def assert_exists
-      # shouldn't have to do this
-      tries = 0
-      until exist? or tries == 10
-        sleep 0.2
-        tries += 1
-      end
-      raise "#{jquery_chain} contains no elements" if tries == 10
     end
   end
 
