@@ -96,6 +96,15 @@ module RQuery
     it "adds selectors to the set of matched elements" do
       jquery("#link1, #link2, #link3").add("#text, #button1").length.should == 5
     end
+
+    it "finds descendant elements" do
+      jquery("html").find("body").find("input").length.should == jquery("form > input").length
+    end
+    
+    it "finds elements that have descendant elements matching a selector" do
+      jquery("html").has("body").length.should == 1
+      jquery("body").has("html").length.should == 0
+    end
     
     it "finds child elements" do
       jquery("form").children.length.should == jquery("form > *").length
@@ -107,6 +116,10 @@ module RQuery
       jquery("#link1").parent("body").is("body").should be_true
     end
     
+    it "finds all parent elements" do
+      jquery("#link1").parents("body").should exist
+    end
+    
     it "finds ancestor elements" do
       jquery("#link1").parents.length.should == 2
       jquery("#link1").parents("body").length.should == 1
@@ -116,21 +129,38 @@ module RQuery
       jquery("#link1").next("a").text.should == "link 2"
     end
     
-    it "finds previous sibling element matching selector" do
-      jquery("#link2").prev("a").text.should == "link 1"
-    end
-    
     it "finds all next sibling elements matching selector" do
       jquery("#link1").next_all("#link2, #link3").map_text.should == ["link 2", "link 3"]
+    end
+    
+    it "finds all next sibling elements until selector matches" do
+      jquery("#link1").next_until("#link3").map_text.should == ["link 2"]
+    end
+
+    it "finds previous sibling element matching selector" do
+      jquery("#link2").prev("a").text.should == "link 1"
     end
     
     it "finds all previous sibling elements matching selector" do
       jquery("#link3").prev_all("#link2, #link1").map_text.should == ["link 2", "link 1"]
     end
     
+    it "finds all previous sibling elements until selector matches" do
+      jquery("#link3").prev_until("#link1").map_text.should == ["link 2"]
+    end
+    
     it "finds siblings" do
       jquery("#link2").siblings("#link1, #link3").map_text.should == ["link 1", "link 3"]
       jquery("#link2").siblings.filter("#link1, #link3").map_text.should == ["link 1", "link 3"]
+    end
+    
+    it "finds the closes element progressing up through the DOM tree" do
+      jquery("#link1").closest("body, head, html").first.tag_name.downcase.should == "body"
+      jquery("#link1").closest("h1").should be_empty
+    end
+    
+    it "gets the value of style properties" do
+      jquery("body").css("font-family").should == "sans-serif"
     end
   
   end

@@ -8,7 +8,7 @@ module RQuery
   
     def val(value=nil)
       if value.nil?
-        eval_jquery ".val()"
+        eval_jquery_method :val
       else
         exec_jquery %|.val("#{value}")|
       end
@@ -16,21 +16,25 @@ module RQuery
   
     def text
       assert_exists
-      eval_jquery ".text()"
+      eval_jquery_method :text
     end
   
     def html
-      eval_jquery ".html()"
+      eval_jquery_method :html
     end
-  
-    def attr(key)
-      eval_jquery ".attr(\"#{key}\")"
+
+    def attr(attribute_name)
+      eval_jquery_method :attr, attribute_name
+    end
+    
+    def css(property_name)
+      eval_jquery_method :css, property_name
     end
   
     def click
       assert_exists
       each_index do |i|
-        eval_jquery("[#{i}]").click
+        self[i].click
       end
     end
     
@@ -50,12 +54,20 @@ module RQuery
       child_set(:nextAll, selector)
     end
     
+    def next_until(selector)
+      child_set(:nextUntil, selector)
+    end
+    
     def prev(selector)
       child_set(:prev, selector)
     end
     
     def prev_all(selector)
       child_set(:prevAll, selector)
+    end
+    
+    def prev_until(selector)
+      child_set(:prevUntil, selector)
     end
     
     def siblings(selector=nil)
@@ -67,7 +79,7 @@ module RQuery
     end
     
     def is(selector)
-      eval_jquery %|.is("#{selector}")|
+      eval_jquery_method :is, selector
     end
     
     def not(selector)
@@ -94,8 +106,16 @@ module RQuery
       child_set(:parents, *(selector.nil? ? [] : [selector]))
     end
     
+    def closest(selector)
+      child_set(:closest, selector)
+    end
+    
     def has_class(names)
-      eval_jquery %|.hasClass("#{names}")|
+      eval_jquery_method :hasClass, names
+    end
+    
+    def has(selector)
+      child_set(:has, selector)
     end
   
     def exist?
@@ -108,6 +128,10 @@ module RQuery
     
     def map_text
       map { |element| element.text }
+    end
+    
+    def tag_name
+      eval_jquery "[0].tagName"
     end
     
     def filter(selector=nil, &block)
@@ -143,7 +167,15 @@ module RQuery
     def eval_jquery(member_expression)
       @browser.eval_js %|return #{jquery_chain}#{member_expression};|
     end
-  
+    
+    def eval_jquery_method(name, *args)
+      eval_jquery %|.#{name}(#{format_args(*args)})|
+    end
+    
+    def format_args(args=[])
+      args.map { |arg| arg.inspect }.join(", ")
+    end
+    
     def child_set(name, *args)
       WrappedSet.new(@browser, self, name, *args.compact)
     end
@@ -179,13 +211,7 @@ module RQuery
     end
   
     def jquery_chain
-      %{#{@parent.jquery_chain}.#{@method.to_s}(#{format_args})}
-    end
-    
-    private
-    
-    def format_args
-      @args.map { |arg| arg.inspect }.join(", ")
+      %{#{@parent.jquery_chain}.#{@method.to_s}(#{format_args(@args)})}
     end
   end
 end
