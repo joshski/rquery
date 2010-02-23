@@ -116,10 +116,6 @@ module RQuery
       jquery("#link1").parent("body").is("body").should be_true
     end
     
-    it "finds all parent elements" do
-      jquery("#link1").parents("body").should exist
-    end
-    
     it "finds ancestor elements" do
       jquery("#link1").parents.length.should == 2
       jquery("#link1").parents("body").length.should == 1
