@@ -1,11 +1,23 @@
 module RQuery
   module WrappedSetMethods
     include Enumerable
+
+    def selector
+      eval_jquery_property :selector
+    end
     
     def length
-      eval_jquery ".length"
+      eval_jquery_property :length
     end
-  
+    
+    def size
+      length
+    end
+    
+    def get(index=nil)
+      index.nil? ? self.to_a : self.eq(index)
+    end
+
     def val(value=nil)
       if value.nil?
         eval_jquery_method :val
@@ -182,8 +194,22 @@ module RQuery
       eval_jquery %|.#{name}(#{format_args(*args)})|
     end
     
+    def eval_jquery_property(name)
+      eval_jquery %|.#{name}|
+    end
+    
     def format_args(args=[])
-      args.map { |arg| arg.inspect }.join(", ")
+      args.map { |arg| format_arg(arg) }.join(", ")
+    end
+    
+    def format_arg(arg)
+      if arg.nil?
+        "null"
+      elsif arg.respond_to?(:jquery_chain)
+        arg.jquery_chain
+      else
+        arg.inspect
+      end
     end
     
     def child_set(name, *args)

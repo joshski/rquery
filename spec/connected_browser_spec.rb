@@ -4,10 +4,6 @@ module RQuery
   describe Browser, "connected to the web" do
     include BrowserDsl
 
-    after(:all) do
-      close
-    end
-    
     it "finds jquery documentation" do
       visit "http://www.google.com"
       title.should include("Google")
