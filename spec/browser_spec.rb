@@ -7,7 +7,6 @@ shared_examples_for "a browser" do
 
   before(:each) do
     unless url == fixture_url
-      puts "visiting..."
       visit fixture_url
     end
   end
@@ -342,7 +341,7 @@ shared_examples_for "a browser" do
   end
 
 end
-=begin
+
 describe "FireFox" do
   it_should_behave_like "a browser"
 
@@ -358,7 +357,7 @@ describe "Chrome" do
     RQuery::BrowserDsl.adapter = :chrome
   end
 end
-=end
+
 if RUBY_PLATFORM.match(/win32|mingw32/)
   describe "Internet Explorer" do
     it_should_behave_like "a browser"
