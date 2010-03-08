@@ -2,13 +2,11 @@ require 'selenium-webdriver'
 
 module RQuery
   class SeleniumAdapter
-    def initialize
+    def initialize(selenium_driver=:firefox)
       @driver = Selenium::WebDriver::Driver.for(selenium_driver)
     end
-  
-    def selenium_driver
-      (ENV['selenium_driver'] || :firefox).to_sym
-    end
+    
+    attr_reader :driver
   
     def visit(url)
       @driver.get(url)

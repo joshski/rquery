@@ -53,6 +53,10 @@ module RQuery
     def [](index)
       eval_jquery("[#{index}]")
     end
+    
+    def first
+      self.eq(0)
+    end
   
     def find(selector)
       child_set(:find, selector)
@@ -173,8 +177,8 @@ module RQuery
     def assert_exists
       # shouldn't have to do this
       tries = 0
-      until exist? or tries == 10
-        sleep 0.2
+      until exist? or tries == 20
+        sleep 0.3
         tries += 1
       end
       raise "#{jquery_chain} contains no elements" if tries == 10

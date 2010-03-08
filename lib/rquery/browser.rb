@@ -5,7 +5,6 @@ module RQuery
     end
   
     def jquery(selector)
-      inject_jquery_if_necessary
       RootWrappedSet.new(self, selector)
     end
   
@@ -43,10 +42,7 @@ module RQuery
     private
   
     def inject_jquery_if_necessary
-      unless jquery_defined?
-        @adapter.eval_js jquery_src
-        @adapter.eval_js define_lower_case_jquery
-      end
+      @adapter.eval_js(jquery_src) unless jquery_defined?
       raise "failed to inject jquery " unless jquery_defined?
     end
   
@@ -56,10 +52,6 @@ module RQuery
   
     def jquery_src
       @@jquery_src ||= File.read(File.join(File.dirname(__FILE__), "jquery.js"))
-    end
-  
-    def define_lower_case_jquery
-      "window.jquery=function() {return jQuery.apply(this, arguments);}"
     end
   end
 end

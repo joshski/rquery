@@ -1,10 +1,15 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-describe RQuery do
+fixture_url = "file://" + File.expand_path(File.join(File.dirname(__FILE__), "fixture.html")).gsub("\\", "/")
+
+shared_examples_for "a browser" do
   include RQuery::BrowserDsl
 
-  before(:all) do
-    visit "file://" + File.join(File.dirname(__FILE__), "fixture.html").gsub("\\", "/")
+  before(:each) do
+    unless url == fixture_url
+      puts "visiting..."
+      visit fixture_url
+    end
   end
   
   describe "Browser" do
@@ -336,4 +341,30 @@ describe RQuery do
     end
   end
 
+end
+=begin
+describe "FireFox" do
+  it_should_behave_like "a browser"
+
+  before(:all) do
+    RQuery::BrowserDsl.adapter = :firefox
+  end
+end
+
+describe "Chrome" do
+  it_should_behave_like "a browser"
+  
+  before(:all) do
+    RQuery::BrowserDsl.adapter = :chrome
+  end
+end
+=end
+if RUBY_PLATFORM.match(/win32|mingw32/)
+  describe "Internet Explorer" do
+    it_should_behave_like "a browser"
+  
+    before(:all) do
+      RQuery::BrowserDsl.adapter = :ie
+    end
+  end
 end

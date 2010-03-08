@@ -1,19 +1,33 @@
 module RQuery
   module BrowserDsl
     extend Forwardable
-    def_delegators :browser, :visit, :jquery, :title, :html, :eval_js
+    def_delegators :browser, :visit, :jquery, :title, :html, :eval_js, :url
+
+    $current_adapter = :firefox
 
     def browser
-      $browser ||= Browser.new(adapter)
+      $browser ||= Browser.new(create_adapter)
     end
   
-    def adapter
-      SeleniumAdapter.new
+    def create_adapter
+      SeleniumAdapter.new($current_adapter)
     end
   
     at_exit do
+      RQuery::BrowserDsl.close
+    end
+    
+    def self.close
       $browser.close unless $browser.nil?
-      $browser = nil
+      $browser = nil      
+    end
+    
+    def self.adapter=(adapter_name)
+      adapter = adapter_name.to_sym
+      if adapter != $current_adapter
+        self.close
+        $current_adapter = adapter
+      end
     end
   end
 end

@@ -21,13 +21,13 @@
     
     <script type="text/javascript">
       function log(what) {
-        $("#log").append('<li>' + what + '</li>');
+        jQuery("#log").append('<li>' + what + '</li>');
         return false;
       }
       function bindToLog(what) { return function() { return log(what); } }
-      $("#button1").click(bindToLog("button 1 clicked"));
-      $("#button2").click(bindToLog("button 2 clicked"));
-      $("#text").change(bindToLog("text changed"));
+      jQuery("#button1").click(bindToLog("button 1 clicked"));
+      jQuery("#button2").click(bindToLog("button 2 clicked"));
+      jQuery("#text").change(bindToLog("text changed"));
     </script>
   </body>
 </html>
