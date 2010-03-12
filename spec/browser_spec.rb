@@ -325,7 +325,14 @@ shared_examples_for "a browser" do
                                               "button 1 clicked",
                                               "button 2 clicked",
                                               "button 2 clicked"] 
-      end      
+      end
+      
+      it "sets checkboxes" do
+        jquery("#check1:checked, #check2:not(:checked)").should_not exist
+        jquery("#check1, #check2").click
+        jquery("#check1:checked, #check2:not(:checked)").length.should == 2
+        jquery("#log li").map_text.should == ["check 1 changed", "check 2 changed"]
+      end
     end
   end
   

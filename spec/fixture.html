@@ -16,6 +16,8 @@
       <input id="button1" type="button" value="button 1" />
       <input id="button2" type="button" value="button 2" />
       <input id="submit" type="submit" value="submit" />
+      <input type="checkbox" name="check1" id="check1" /> <label for="check1">Check 1</label>
+      <input type="checkbox" name="check2" id="check2" checked="checked" /> <label for="check2">Check 2</label>
     </form>
     <ul id="log"></ul>
     
@@ -27,6 +29,8 @@
       function bindToLog(what) { return function() { return log(what); } }
       jQuery("#button1").click(bindToLog("button 1 clicked"));
       jQuery("#button2").click(bindToLog("button 2 clicked"));
+      jQuery("#check1").change(bindToLog("check 1 changed"));
+      jQuery("#check2").change(bindToLog("check 2 changed"));
       jQuery("#text").change(bindToLog("text changed"));
     </script>
   </body>
