@@ -34,6 +34,10 @@ module RQuery
     def html
       eval_jquery_method :html
     end
+    
+    def and_self
+      child_set :andSelf
+    end
 
     def attr(attribute_name)
       eval_jquery_method :attr, attribute_name

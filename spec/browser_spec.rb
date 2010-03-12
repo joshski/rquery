@@ -254,7 +254,7 @@ shared_examples_for "a browser" do
     
       describe "and_self()" do
         it "adds the previous selection to the current selection." do
-          pending
+          jquery("#link1").next("a").and_self.eq(0).attr('id').should == "link1"
         end
       end
     
