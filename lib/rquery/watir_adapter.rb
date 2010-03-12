@@ -1,8 +1,7 @@
-require 'watir-webdriver'
-
 module RQuery
   class WatirAdapter
     def initialize
+      require 'watir-webdriver'
       @watir_browser = Watir::Browser.new(watir_driver)
     end
   
