@@ -61,6 +61,16 @@ module RQuery
     def find(selector)
       child_set(:find, selector)
     end
+    
+    def index(subject=nil)
+      if subject.nil?
+        eval_jquery_method :index
+      elsif subject.respond_to?(:jquery_chain)
+        eval_jquery ".index(#{subject.jquery_chain})"
+      else
+        eval_jquery_method :index, subject
+      end
+    end
   
     def next(selector)
       child_set(:next, selector)

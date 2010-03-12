@@ -71,7 +71,9 @@ shared_examples_for "a browser" do
       describe "index(subject)" do
         it "Searches every matched element for the object and returns the index of the wrapped set, if " +
            "found, starting with zero." do
-          pending
+          jquery("#link1, #link2").index(jquery("#link2")).should == 1
+          jquery("#link2").index("#link1, #link2").should == 1
+          jquery("form > *:eq(1)").index.should == 1
         end
       end
       
