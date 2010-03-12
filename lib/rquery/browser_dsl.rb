@@ -3,7 +3,7 @@ module RQuery
     extend Forwardable
     def_delegators :browser, :visit, :jquery, :title, :html, :eval_js, :url
 
-    $current_adapter = :firefox
+    $current_adapter = (ENV["selenium_driver"] || :firefox).to_sym
 
     def browser
       $browser ||= Browser.new(create_adapter)
