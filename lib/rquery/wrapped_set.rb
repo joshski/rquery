@@ -22,7 +22,10 @@ module RQuery
       if value.nil?
         eval_jquery_method :val
       else
-        exec_jquery %|.val("#{value}")|
+        self.each do |element|
+          element[0].clear
+          element[0].send_keys value
+        end
       end
     end
   

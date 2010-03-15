@@ -9,6 +9,7 @@ shared_examples_for "a browser" do
     unless url == fixture_url
       visit fixture_url
     end
+    eval_js("jQuery('#log li').remove(); return true;")
   end
   
   describe "Browser" do
@@ -131,7 +132,7 @@ shared_examples_for "a browser" do
     
       describe "not(expr)" do
         it "removes elements matching the specified expression from the set of matched elements." do
-          jquery("input").not("#text").length.should ==  jquery("input").length - 1
+          jquery("input").not("#text1").length.should ==  jquery("input").length - 1
         end        
       end
     
@@ -149,7 +150,7 @@ shared_examples_for "a browser" do
     
       describe "add(expr)" do
         it "adds more elements, matched by the given expression, to the set of matched elements." do
-          jquery("#link1, #link2, #link3").add("#text, #button1").length.should == 5
+          jquery("#link1, #link2, #link3").add("#text1, #button1").length.should == 5
         end
       end
     
@@ -302,7 +303,7 @@ shared_examples_for "a browser" do
     
     describe "val()" do
       it "gets the input value of the first matched element." do
-        jquery("#text").val.should == "text"
+        jquery("#text1").val.should == "text"
         jquery("input[type='text']").val.should == "text"
       end
     end
@@ -341,11 +342,16 @@ shared_examples_for "a browser" do
   describe "Manipulation:" do
     describe "val(value)" do
       it "set the value of each element in the set of matched elements." do
-        jquery("#text").val("new value")
-        jquery("#text").attr('value').should == "new value"
+        jquery("#text1").val("new value")
+        jquery("#text1").attr('value').should == "new value"
         jquery("input[type='text']").val("even newer value")
         jquery("input[type='text']").attr('value').should == "even newer value"
-      end      
+      end
+      
+      it "raises the changed event for text inputs" do
+        jquery("#text1").val("new value")
+        jquery("#log li").map_text.should == ["text 1 changed"]
+      end
     end
   end
 

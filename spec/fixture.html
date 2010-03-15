@@ -11,7 +11,7 @@
     <a id="link3" href="http://link3/" style="color: blue">link 3</a>
     
     <form id="form" action="fixture.html?something">
-      <input id="text" type="text" value="text" />
+      <input id="text1" type="text" value="text" />
       <input id="text2" type="text" value="text2" />
       <input id="button1" type="button" value="button 1" />
       <input id="button2" type="button" value="button 2" />
@@ -27,6 +27,8 @@
         return false;
       }
       function bindToLog(what) { return function() { return log(what); } }
+      jQuery("#text1").change(bindToLog("text 1 changed"));
+      jQuery("#text2").change(bindToLog("text 2 changed"));
       jQuery("#button1").click(bindToLog("button 1 clicked"));
       jQuery("#button2").click(bindToLog("button 2 clicked"));
       jQuery("#check1").change(bindToLog("check 1 changed"));
