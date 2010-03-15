@@ -341,16 +341,27 @@ shared_examples_for "a browser" do
   
   describe "Manipulation:" do
     describe "val(value)" do
-      it "set the value of each element in the set of matched elements." do
+      it "sets the value of each element in the set of matched text input elements." do
         jquery("#text1").val("new value")
         jquery("#text1").attr('value').should == "new value"
         jquery("input[type='text']").val("even newer value")
         jquery("input[type='text']").attr('value').should == "even newer value"
       end
       
+      it "sets the value of each element in the set of matched select elements." do
+        jquery("#select1, #select2").val("B")
+        jquery("#select1").val.should == "B"
+        jquery("#select2").val.should == "B"
+      end
+      
       it "raises the changed event for text inputs" do
         jquery("#text1").val("new value")
         jquery("#log li").map_text.should == ["text 1 changed"]
+      end
+      
+      it "raises the changed event for select lists" do
+        jquery("#select1, #select2").val("C")
+        jquery("#log li").map_text.should == ["select 1 changed", "select 2 changed"]
       end
     end
   end

@@ -22,9 +22,8 @@ module RQuery
       if value.nil?
         eval_jquery_method :val
       else
-        self.each do |element|
-          element[0].clear
-          element[0].send_keys value
+        self.each do |set|
+          set_element_value set[0], value
         end
       end
     end
@@ -230,6 +229,19 @@ module RQuery
         arg.jquery_chain
       else
         arg.inspect
+      end
+    end
+    
+    def set_element_value(element, value)
+      case element.tag_name.downcase 
+        when "select" then
+          # hmm I think this should work, but doesn't
+          # set.find("option").detect { |opt| opt.text == value }.first.select
+          # selenium-webdriver specific
+          element.find_elements(:tag_name, "option").select { |option| option.text == value }.first.select
+        when "input" then
+          element.clear
+          element.send_keys value
       end
     end
     
