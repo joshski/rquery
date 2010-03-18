@@ -14,7 +14,7 @@ module RQuery
     end
   
     at_exit do
-      RQuery::BrowserDsl.close
+      RQuery::BrowserDsl.close unless ENV["keep_browser_open"] == "true"
     end
     
     def self.close
